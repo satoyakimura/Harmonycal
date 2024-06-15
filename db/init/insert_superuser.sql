@@ -1,0 +1,1 @@
+INSERT INTO userdata (username, email) VALUES ('admin', 'test@gmail.com')
