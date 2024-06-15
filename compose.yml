@@ -4,11 +4,11 @@ services:
   backend:
     build: 
       context: ./backend
-      dockerfile: ./backend/dockerfile
+      dockerfile: ./dockerfile
     volumes:
-      - ./backend:/backend
+      - ./backend:/app
     ports:
-      - 8888:8888
+      - 8888:8000
     env_file:
       - .env
     networks:
