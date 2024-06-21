@@ -18,5 +18,5 @@ erDiagram
         start_date TIMESTAMP
         end_date TIMESTAMP
     }
-    userdata || -- || schedule
+    userdata || -- || schedule: ""
 ```
