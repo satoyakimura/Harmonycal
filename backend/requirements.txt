@@ -2,3 +2,6 @@ fastapi
 uvicorn
 
 SQLAlchemy
+pydantic-settings
+psycopg2-binary
+passlib
