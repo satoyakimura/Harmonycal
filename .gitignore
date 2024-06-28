@@ -1,6 +1,10 @@
 # Vue.js
 /frontend/*
 !/frontend/src/
+!/frontend/package.json
+!/frontend/dockerfile
+!README.md
+
 
 # Logs
 logs/
