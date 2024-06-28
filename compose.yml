@@ -3,8 +3,8 @@ version: '3.8'
 services:
   backend:
     build: 
-      context: ./backend
-      dockerfile: ./dockerfile
+      context: .
+      dockerfile: ./backend/dockerfile
     volumes:
       - ./backend:/app
     ports:
@@ -30,9 +30,22 @@ services:
     networks:
       - web
 
-      
+  frontend:
+    build: 
+      context: .
+      dockerfile: ./frontend/dockerfile
+    # volumes:
+    #   - ./frontend: frontend
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+    stdin_open: true
+    tty: true
+
 networks:
   web:
+    driver: bridge
 
 volumes:
   db_store:
