@@ -8,7 +8,7 @@ services:
     volumes:
       - ./backend:/app
     ports:
-      - 8888:8888
+      - "8888:8888"
     env_file:
       - .env
     networks:
@@ -40,9 +40,13 @@ services:
       - "5173:5173"
     depends_on:
       - backend
+    networks:
+      - web
     stdin_open: true
     tty: true
 
+
+      
 networks:
   web:
     driver: bridge

@@ -4,7 +4,7 @@ from sqlalchemy.orm import relationship
 
 from app.core import Base
 
-class UserModel(Base):
+class User(Base):
     __tablename__ = "userdata"
 
     id = Column(Integer, primary_key=True, index=True)
@@ -12,4 +12,3 @@ class UserModel(Base):
     password = Column(String)
     email = Column(String, unique=True, nullable=False)
     created_at = Column(DateTime, default=datetime.now(), nullable=False)
-    
