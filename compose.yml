@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  backend:
+    build: 
+      context: .
+      dockerfile: ./backend/dockerfile
+    volumes:
+      - ./backend:/app
+    ports:
+      - "8888:8888"
+    env_file:
+      - .env
+    networks:
+      - web
+    depends_on:
+      - db
+
+  db:
+    image: postgres:15.6
+    volumes:
+      - db_store:/var/lib/postgresql/data/
+      - ./db/init:/docker-entrypoint-initdb.d
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - 5432:5432
+    networks:
+      - web
+
+  frontend:
+    build: 
+      context: .
+      dockerfile: ./frontend/dockerfile
+    volumes:
+      - ./frontend/src:/frontend/src
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+    networks:
+      - web
+    stdin_open: true
+    tty: true
+
+
+      
+networks:
+  web:
+    driver: bridge
+
+volumes:
+  db_store:
