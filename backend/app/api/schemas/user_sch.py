@@ -6,7 +6,6 @@ class UserBase(BaseModel):
 
 class UserCreate(UserBase):
     password: str = Field(..., title="Password")
-    email: str = Field(..., title="Email")
 
 class User(UserBase):
     id: int = Field(0, title="User ID")

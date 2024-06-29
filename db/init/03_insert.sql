@@ -1,1 +1,1 @@
-INSERT INTO userdata (username, password, email) VALUES ('admin', 'password', 'email');
+INSERT INTO userdata (username, password VALUES ('admin', 'password');
