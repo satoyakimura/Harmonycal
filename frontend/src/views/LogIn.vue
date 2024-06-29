@@ -23,7 +23,7 @@ const passwordRules = [
 
 const logInAccount = async () => {
   await axios
-    .post('/user/login', {
+    .post('/login', {
       username: user_id.value,
       password: password.value,
     })

@@ -5,3 +5,4 @@ SQLAlchemy
 pydantic-settings
 psycopg2-binary
 passlib
+bcrypt

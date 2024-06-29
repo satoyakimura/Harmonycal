@@ -23,7 +23,7 @@ const passwordRules = [
 
 const registerAccount = async () => {
   await axios
-    .post('/user/signup', {
+    .post('/signup', {
       username: user_id.value,
       password: password.value,
     })
