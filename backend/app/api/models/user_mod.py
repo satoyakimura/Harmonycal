@@ -2,6 +2,7 @@ from datetime import datetime
 from sqlalchemy import Column, DateTime, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship
 
+from app.api.models import Schedule
 from app.core import Base
 
 class User(Base):
@@ -11,3 +12,4 @@ class User(Base):
     username = Column(String, unique=True, index=True)
     password = Column(String)
     created_at = Column(DateTime, default=datetime.now(), nullable=False)
+    schedules = relationship("Schedule", back_populates="owner")

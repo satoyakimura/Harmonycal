@@ -1,3 +1,7 @@
+-- DROP TABLE IF EXISTS userdata;
+-- DROP TABLE IF EXISTS schedule;
+
+
 -- テーブル:userdata
 DROP TABLE IF EXISTS userdata;
 CREATE TABLE userdata(
