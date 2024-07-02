@@ -1,6 +1,8 @@
 from datetime import datetime
 from pydantic import BaseModel, Field
 
+from app.api.models import User
+
 class UserBase(BaseModel):
     username: str = Field(..., title="User Name")
 
@@ -8,8 +10,8 @@ class UserCreate(UserBase):
     password: str = Field(..., title="Password")
 
 class User(UserBase):
-    id: int = Field(0, title="User ID")
-    created_at: datetime = Field(datetime.now(), title="Creation Date")
+    id: int
+    created_at: datetime
 
     class Config:
         orm_mode = True

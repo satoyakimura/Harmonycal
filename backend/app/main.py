@@ -1,12 +1,13 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.endpoints import user_router, view_router
+from app.api.endpoints import user_router, view_router, schedule_router
 
 
 app = FastAPI()
 app.include_router(user_router)
 app.include_router(view_router)
+app.include_router(schedule_router)
 
 
 origins = [
