@@ -10,8 +10,8 @@ class Schedule(Base):
     id = Column(Integer, primary_key=True, index=True)
     title = Column(String, index=True)
     description = Column(String)
-    start_date = Column(DateTime, default=datetime.now(), nullable=False)
-    end_date = Column(DateTime, default=datetime.now(), nullable=False)
+    start_date = Column(DateTime, nullable=False)
+    end_date = Column(DateTime, nullable=False)
     owner_id = Column(Integer, ForeignKey('userdata.id'), nullable=False)
 
     owner = relationship("User", back_populates="schedules")

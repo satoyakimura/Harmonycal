@@ -23,4 +23,5 @@ async def home(request: Request, db: Session = Depends(get_db)):
     if not current_user:
         return RedirectResponse(url="/login", status_code=303)
     schedules = schedule_crud.read_schedules_by_user_id(db=db, user_id=current_user.id)
+
     return schedules
