@@ -14,5 +14,13 @@ async def createschedule(schedule: schedule_sch.ScheduleCreate, request: Request
     current_user = get_current_user(request, db)
     if not current_user:
         return RedirectResponse(url="/login", status_code=303)
-    new_schedule = schedule_crud.create_schedule(db=db, schedule=schedule, owner_id=current_user.id)
+    new_schedule = schedule_crud.create_schedule(db=db, schedule=schedule, user_id=current_user.id)
     return schedule
+
+@schedule_router.post("/deleteschedule/{schedule_id}", response_model=schedule_sch.Schedule, tags=['schedule'])
+async def deleteschedule(schedule_id: int, request: Request, db: Session = Depends(get_db)):
+    current_user = get_current_user(request, db)
+    if not current_user:
+        return RedirectResponse(url="/login", status_code=303)
+    delete_schedule = schedule_crud.delete_schedule_by_id(db=db, user_id=current_user.id, schedule_id=schedule_id)
+    return delete_schedule
