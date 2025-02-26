@@ -2,7 +2,7 @@ from fastapi import Depends, APIRouter, HTTPException, Request, status, Cookie, 
 from sqlalchemy.orm import Session
 from passlib.context import CryptContext
 from datetime import datetime, timedelta
-
+import pytz
 
 from app.api.crud import user_crud
 from app.core import get_db
@@ -10,6 +10,7 @@ from app.api.schemas import user_sch
 
 user_router = APIRouter()
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+tokyo_tz = pytz.timezone("Asia/Tokyo")
 
 @user_router.get("/user", response_model=list[user_sch.User], tags=["user"])
 async def read_user(offset: int = 0,
@@ -31,7 +32,7 @@ async def signup(user: user_sch.UserCreate, db: Session = Depends(get_db)):
     db_user = user_crud.read_user_by_name(db=db, user_name=user.username)
     if db_user:
         raise HTTPException(
-            status_code=400, detail="Username already registered")
+            status_code=400, detail="そのユーザー名はすでに使われています")
     hashed_pass = hash_password(user.password)
     user_data = user.copy(update={"password": hashed_pass})
     new_user = user_crud.create_user(db=db, user=user_data)
@@ -42,12 +43,23 @@ async def login(user: user_sch.UserCreate, response: Response, db: Session = Dep
     db_user = user_crud.read_user_by_name(db=db, user_name=user.username)
     if not db_user or not verify_password(user.password, db_user.password):
         raise HTTPException(status_code=401, detail="Incorrect username or password")
-    response.set_cookie(key="user_id", value=str(db_user.id))
+    # Cookieをセット (7日間有効)
+    expires = datetime.now(tokyo_tz) + timedelta(days=7)
+
+    response.set_cookie(
+        key="user_id",
+        value=str(db_user.id),
+        httponly=True,  # JavaScriptからアクセス不可 (セキュリティ向上)
+        secure=False,   # 開発環境では False (本番は True)
+        samesite="Lax", # CSRF対策
+        expires=expires.strftime("%a, %d %b %Y %H:%M:%S GMT")
+    )
     return db_user
 
 @user_router.get("/set-cookie")
 async def set_cookie(response: Response):
-    response.set_cookie(key="my_cookie", value="cookie_value", expires=datetime.utcnow() + timedelta(days=7))
+    response.set_cookie(
+        key="user_id", value="cookie_value", expires=datetime.now(tokyo_tz) + timedelta(days=7))
     return {"message": "Cookie set successfully"}
 
 def hash_password(password: str) -> str:

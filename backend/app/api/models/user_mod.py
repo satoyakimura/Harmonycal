@@ -13,3 +13,4 @@ class User(Base):
     password = Column(String)
     created_at = Column(DateTime, default=datetime.now(), nullable=False)
     schedules = relationship("Schedule", back_populates="owner")
+    records = relationship("Record", back_populates="owner")

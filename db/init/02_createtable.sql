@@ -1,7 +1,3 @@
--- DROP TABLE IF EXISTS userdata;
--- DROP TABLE IF EXISTS schedule;
-
-
 -- テーブル:userdata
 DROP TABLE IF EXISTS userdata;
 CREATE TABLE userdata(
@@ -24,3 +20,14 @@ CREATE TABLE schedule(
     FOREIGN KEY (owner_id) REFERENCES userdata (id)
 );
 
+-- table: record
+DROP TABLE IF EXISTS record;
+CREATE TABLE record(
+    id SERIAL PRIMARY KEY,
+    title VARCHAR(255),
+    description VARCHAR(255),
+    start_date TIMESTAMP NOT NULL,
+    end_date TIMESTAMP NOT NULL,
+    owner_id INT,
+    FOREIGN KEY (owner_id) REFERENCES userdata (id)
+);

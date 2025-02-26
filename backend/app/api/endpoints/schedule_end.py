@@ -9,7 +9,7 @@ from app.api.crud import schedule_crud
 
 schedule_router = APIRouter()
 
-@schedule_router.post("/createschedule", response_model=schedule_sch.ScheduleCreate, tags=['schedule'])
+@schedule_router.post("/schedule/create", response_model=schedule_sch.ScheduleCreate, tags=['schedule'])
 async def createschedule(schedule: schedule_sch.ScheduleCreate, request: Request, db:Session = Depends(get_db)):
     current_user = get_current_user(request, db)
     if not current_user:
@@ -17,10 +17,26 @@ async def createschedule(schedule: schedule_sch.ScheduleCreate, request: Request
     new_schedule = schedule_crud.create_schedule(db=db, schedule=schedule, user_id=current_user.id)
     return schedule
 
-@schedule_router.post("/deleteschedule/{schedule_id}", response_model=schedule_sch.Schedule, tags=['schedule'])
+@schedule_router.post("/schedule/delete/{schedule_id}", response_model=schedule_sch.Schedule, tags=['schedule'])
 async def deleteschedule(schedule_id: int, request: Request, db: Session = Depends(get_db)):
     current_user = get_current_user(request, db)
     if not current_user:
         return RedirectResponse(url="/login", status_code=303)
     delete_schedule = schedule_crud.delete_schedule_by_id(db=db, user_id=current_user.id, schedule_id=schedule_id)
     return delete_schedule
+
+@schedule_router.get("/schedule/month", tags=['schedule'])
+async def month_schedule(request: Request, db: Session = Depends(get_db)):
+    current_user = get_current_user(request, db)
+    if not current_user:
+        return RedirectResponse(url="/login", status_code=303)
+    month_schedule = schedule_crud.read_schedules_by_user_id(db=db, user_id=current_user.id)
+    return month_schedule
+
+@schedule_router.get("/schedule/week", tags=['schedule'])
+async def week_schedule(request: Request, db: Session = Depends(get_db)):
+    current_user = get_current_user(request, db)
+    if not current_user:
+        return RedirectResponse(url="/login", status_code=303)
+    week_schedule = schedule_crud.read_records_by_week(db=db, user_id=current_user.id)
+    return week_schedule
