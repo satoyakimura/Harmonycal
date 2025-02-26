@@ -30,7 +30,7 @@ const logInAccount = async () => {
     .then((res) => {
       sessionStorage.setItem('user_id', res.data.id)
       sessionStorage.setItem('user_name', res.data.username)
-      router.push('/')
+      router.push('/schedule/month')
     })
     .catch((err) => {
       console.log(err)

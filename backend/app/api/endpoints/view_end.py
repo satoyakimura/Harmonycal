@@ -17,11 +17,11 @@ def get_current_user(request: Request, db:Session) -> user_sch.User:
     user = user_crud.read_user_by_id(db=db, user_id=user_id)
     return user
 
-@view_router.get("/", tags=["root"])
-async def home(request: Request, db: Session = Depends(get_db)):
-    current_user = get_current_user(request, db)
-    if not current_user:
-        return RedirectResponse(url="/login", status_code=303)
-    schedules = schedule_crud.read_schedules_by_user_id(db=db, user_id=current_user.id)
+# @view_router.get("/", tags=["root"])
+# async def home(request: Request, db: Session = Depends(get_db)):
+#     current_user = get_current_user(request, db)
+#     if not current_user:
+#         return RedirectResponse(url="/login", status_code=303)
+#     schedules = schedule_crud.read_schedules_by_user_id(db=db, user_id=current_user.id)
 
-    return schedules
+#     return schedules

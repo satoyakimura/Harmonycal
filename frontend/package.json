@@ -14,7 +14,8 @@
     "vue": "^3.4.29",
     "vue-router": "^4.3.3",
     "vuetify": "3.6.10",
-    "axios": "1.7.2"
+    "axios": "1.7.2",
+    "date-fns": "^2.x.x"
   },
   "devDependencies": {
     "@tsconfig/node20": "^20.1.4",
