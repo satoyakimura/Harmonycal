@@ -30,7 +30,7 @@ const registerAccount = async () => {
     .then((res) => {
       sessionStorage.setItem('user_id', res.data.id)
       sessionStorage.setItem('user_name', res.data.username)
-      router.push('/')
+      router.push('/login')
     })
     .catch((err) => {
       console.log(err)
