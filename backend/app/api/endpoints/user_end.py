@@ -56,11 +56,35 @@ async def login(user: user_sch.UserCreate, response: Response, db: Session = Dep
     )
     return db_user
 
+@user_router.get("/signup", tags=['user'])
+async def signup_page():
+    return {"message": "Signup page (GET)"}
+
+
+@user_router.get("/login", tags=['user'])
+async def login_page():
+    return {"message": "Login page (GET)"}
+
+
+@user_router.post("/logout", tags=['user'])
+async def logout(response: Response):
+    response.delete_cookie("user_id")  # Cookieを削除
+    return None
+
+
 @user_router.get("/set-cookie")
 async def set_cookie(response: Response):
+    expires = datetime.now(tokyo_tz) + timedelta(days=7)
     response.set_cookie(
-        key="user_id", value="cookie_value", expires=datetime.now(tokyo_tz) + timedelta(days=7))
+        key="user_id",
+        value="cookie_value",
+        expires=expires,
+        httponly=False,   # JavaScriptからアクセス不可
+        secure=False,    # 本番環境では True に設定
+        samesite="Lax",  # クロスサイトリクエストでも Cookie を送信
+    )
     return {"message": "Cookie set successfully"}
+
 
 def hash_password(password: str) -> str:
     return pwd_context.hash(password)

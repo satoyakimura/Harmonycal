@@ -3,12 +3,25 @@ import { useRouter } from 'vue-router';
 
 const router = useRouter()
 
-const signOutAccount = () => {
-  sessionStorage.removeItem('user_id')
-  sessionStorage.removeItem('user_name')
-  router.push('/login')
-}
+const signOutAccount = async () => {
+  try {
+    const response = await fetch('http://localhost:8888/logout', { 
+      method: 'POST',
+      credentials: 'include'  // Cookieを送信するために必要
+    });
+
+    if (response.ok) {
+      console.log("Logged out successfully");
+      router.push('/login');  // ログアウト後にログインページへ
+    } else {
+      console.error("Logout failed");
+    }
+  } catch (error) {
+    console.error("Error logging out:", error);
+  }
+};
 </script>
+
 <template>
   <v-app-bar color="indigo">
     <v-toolbar-title class="font-weight-black" style="padding-left: 20px;">

@@ -23,6 +23,7 @@ const router = createRouter({
       name: 'login',
       component: LogIn
     },
+    
     {
       path: '/schedule/month',
       name : 'schedulemonth',
