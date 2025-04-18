@@ -17,6 +17,8 @@ def get_current_user(request: Request, db:Session) -> user_sch.User:
     user = user_crud.read_user_by_id(db=db, user_id=user_id)
     return user
 
+
+
 # @view_router.get("/", tags=["root"])
 # async def home(request: Request, db: Session = Depends(get_db)):
 #     current_user = get_current_user(request, db)

@@ -15,7 +15,10 @@
     "vue-router": "^4.3.3",
     "vuetify": "3.6.10",
     "axios": "1.7.2",
-    "date-fns": "^2.x.x"
+    "date-fns": "^2.x.x",
+    "@fullcalendar/core": "^6.1.11",
+    "@fullcalendar/daygrid": "^6.1.11",
+    "@fullcalendar/vue3": "^6.1.11"
   },
   "devDependencies": {
     "@tsconfig/node20": "^20.1.4",

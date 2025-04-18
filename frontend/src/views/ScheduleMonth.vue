@@ -1,205 +1,70 @@
 <template>
-    <v-container fluid class="calendar-container">
-      <v-row class="justify-center">
-        <v-col cols="12" md="10" lg="8">
-          <v-card>
-            <v-card-title>
-              <v-btn @click="goToPreviousMonth" icon>
-                <v-icon>mdi-chevron-left</v-icon>
-              </v-btn>
-              <span class="text-h4">{{ formattedMonth }}</span>
-              <v-btn @click="goToNextMonth" icon>
-                <v-icon>mdi-chevron-right</v-icon>
-              </v-btn>
-            </v-card-title>
-            <v-divider></v-divider>
-            <!-- 曜日の表示 -->
-            <v-card-text>
-              <v-row class="calendar-header">
-                <v-col v-for="(day, index) in weekdays" :key="index" cols="1" class="text-center">
-                  <span class="text-body-1">{{ day }}</span>
-                </v-col>
-              </v-row>
-              <v-row class="calendar-body">
-                <!-- 空白のセル -->
-                <v-col
-                  v-for="(day, index) in leadingEmptyDays"
-                  :key="'empty-' + index"
-                  cols="1"
-                  class="calendar-cell"
-                ></v-col>
-  
-                <!-- 日付のセル -->
-                <v-col
-                  v-for="(day, index) in daysInMonth"
-                  :key="index"
-                  cols="1"
-                  class="calendar-cell"
-                >
-                  <v-card :class="{'bg-blue-grey': isToday(day)}" class="day-card">
-                    <v-card-title class="text-center">{{ day.getDate() }}</v-card-title>
-                    <v-list dense>
-                      <v-list-item-group v-if="eventsForDay(day)">
-                        <v-list-item v-for="(event, index) in eventsForDay(day)" :key="index">
-                          <v-list-item-content>
-                            <v-list-item-title>{{ event.title }}</v-list-item-title>
-                            <v-list-item-subtitle>{{ event.description }}</v-list-item-subtitle>
-                          </v-list-item-content>
-                        </v-list-item>
-                      </v-list-item-group>
-                    </v-list>
-                  </v-card>
-                </v-col>
-                <!-- 空白のセル（最後の週に余る場合）-->
-                <v-col
-                  v-for="(day, index) in trailingEmptyDays"
-                  :key="'empty-end-' + index"
-                  cols="1"
-                  class="calendar-cell"
-                ></v-col>
-              </v-row>
-            </v-card-text>
-          </v-card>
-        </v-col>
-      </v-row>
-    </v-container>
-  </template>
-  
-  <script setup>
-  import { ref, computed, onMounted } from 'vue';
-  import axios from 'axios';
-  import { useRouter } from 'vue-router';
-  import { format, startOfMonth, endOfMonth, addMonths, subMonths, eachDayOfInterval, getDay } from 'date-fns';
-  
-  const router = useRouter();
-  const currentMonth = ref(new Date());
-  const allSchedules = ref([]);  // ユーザーの全スケジュール
-  const formattedMonth = computed(() => format(currentMonth.value, 'yyyy年MM月'));
-  const daysInMonth = ref([]);
-  const weekdays = ['日', '月', '火', '水', '木', '金', '土'];  // 曜日
-  
-  // 月初の曜日と、空白の日数を計算（その月の最初の曜日に基づく）
-  const leadingEmptyDays = computed(() => {
-    const startOfMonthDate = startOfMonth(currentMonth.value);
-    const startDayOfWeek = getDay(startOfMonthDate);  // 月の初日の曜日を取得
-    return Array(startDayOfWeek).fill(null);  // 初日の曜日分だけ空白を追加
-  });
-  
-  // 最後の週の余りの日数
-  const trailingEmptyDays = computed(() => {
-    const endOfMonthDate = endOfMonth(currentMonth.value);
-    const endDayOfWeek = getDay(endOfMonthDate);  // 月末の曜日を取得
-    const trailingDays = 6 - endDayOfWeek;  // 月末が土曜日なら0、金曜日なら1というように余りを計算
-    return Array(trailingDays).fill(null);  // 余った日数分だけ空白を追加
-  });
-  
-  // フィルタリングされた予定を表示するためのメソッド
-  const eventsForDay = (day) => allSchedules.value.filter(event => {
-    const eventStartDate = new Date(event.start_date);
-    return eventStartDate.getDate() === day.getDate() && eventStartDate.getMonth() === day.getMonth();
-  });
-  
-  // 今日かどうかを判定するメソッド
-  const isToday = (day) => format(day, 'yyyy-MM-dd') === format(new Date(), 'yyyy-MM-dd');
-  
-  // 月初と月末の日付を取得して、その間の日付をリスト化
-  const getDaysInMonth = () => {
-    const start = startOfMonth(currentMonth.value);
-    const end = endOfMonth(currentMonth.value);
-    daysInMonth.value = eachDayOfInterval({ start, end });
-  };
-  
-  const fetchAllSchedules = async () => {
+    <div class="calendar-container">
+        <FullCalendar
+            :options="calendarOptions"
+            class="fullcalendar"
+        />
+    </div>
+</template>
+
+<script setup>
+import { ref, onMounted, computed } from 'vue';
+import FullCalendar from '@fullcalendar/vue3';
+import dayGridPlugin from '@fullcalendar/daygrid';
+import jaLocale from '@fullcalendar/core/locales/ja';
+
+const events = ref([]); // イベントデータを保持するリアクティブ変数
+
+const fetchSchedules = async () => {
     try {
-      const response = await axios.get('/schedule/month');  // 全てのスケジュールを取得
-      allSchedules.value = response.data;
+        const response = await fetch('http://localhost:8888/schedule/month', {
+            method: 'GET',
+            credentials: 'include' // クッキーを送る
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to fetch schedules');
+        }
+
+        const data = await response.json();
+
+        // 取得したデータを FullCalendar 用の形式に変換
+        events.value = data.map(schedule => ({
+            title: schedule.title,
+            start: new Date(schedule.start_date).toISOString(),
+            end: new Date(schedule.end_date).toISOString(),
+            description: schedule.description
+        }));
     } catch (error) {
-      console.error('Error fetching schedule:', error);
-      router.push('/login');
+        console.error('Error fetching schedules:', error);
     }
-  };
-  
-  // 前月に移動するメソッド
-  const goToPreviousMonth = () => {
-    currentMonth.value = subMonths(currentMonth.value, 1);
-    getDaysInMonth();
-    fetchAllSchedules();  // 新しい月に合わせてデータを再取得
-  };
-  
-  // 次月に移動するメソッド
-  const goToNextMonth = () => {
-    currentMonth.value = addMonths(currentMonth.value, 1);
-    getDaysInMonth();
-    fetchAllSchedules();  // 新しい月に合わせてデータを再取得
-  };
-  
-  // コンポーネントがマウントされた際に呼び出される
-  onMounted(() => {
-    getDaysInMonth();
-    fetchAllSchedules();  // 初期スケジュールデータを取得
-  });
-  </script>
-  
-  <style scoped>
-  .calendar-container {
-    height: 80vh;  /* 画面いっぱいにカレンダーを表示 */
-    width: 100vh;
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .calendar-header {
-    display: flex;
-    justify-content: space-between;
-  }
-  
-  .calendar-body {
-    overflow-y: auto;
-  }
-  
-  .calendar-cell {
-    padding: 10px;
-  }
-  
-  .day-card {
-    width: 100%;  /* 横幅を100%に設定 */
-    height: 100%;  /* 縦幅を100%に設定 */
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-  }
-  
-  .v-card-title {
-    font-size: 1.4rem;
-    padding: 8px;
-  }
-  
-  .v-list-item-title {
-    font-size: 1rem;
-  }
-  
-  .v-list-item-subtitle {
-    font-size: 0.9rem;
-  }
-  
-  .bg-blue-grey {
-    background-color: #607d8b;
-    color: white;
-  }
-  
-  @media (max-width: 600px) {
-    .calendar-cell {
-      padding: 5px;
-    }
-  
-    .v-card-title {
-      font-size: 1.2rem;
-    }
-  
-    .day-card {
-      width: 100%;  /* 横幅を100%に設定 */
-      height: 100%;  /* 縦幅を100%に設定 */
-    }
-  }
-  </style>
-  
+};
+
+// Vue の onMounted でデータ取得を実行
+onMounted(fetchSchedules);
+
+// calendarOptions を computed にして events を動的に反映
+const calendarOptions = computed(() => ({
+    plugins: [dayGridPlugin],
+    initialView: 'dayGridMonth',
+    height: 'calc(100vh - 20px)', // ナビゲーションバー分を差し引く
+    locale: jaLocale,
+    headerToolbar: {
+        left: 'prev,next today',
+        center: 'title',
+        right: 'dayGridMonth,dayGridWeek'
+    },
+    events: events.value // 直接 events を適用
+}));
+</script>
+
+<style>
+.calendar-container {
+    padding-top: 80px;
+    width: 100vw;
+    overflow: hidden;
+}
+.fullcalendar {
+    width: 100%;
+}
+</style>

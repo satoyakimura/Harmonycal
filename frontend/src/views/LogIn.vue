@@ -21,21 +21,24 @@ const passwordRules = [
                         // v => 7 <= v.length || '8文字以上で入力してください',
                       ]
 
+
 const logInAccount = async () => {
-  await axios
-    .post('/login', {
+  try {
+    const res = await axios.post('http://localhost:8888/login', {
       username: user_id.value,
       password: password.value,
-    })
-    .then((res) => {
-      sessionStorage.setItem('user_id', res.data.id)
-      sessionStorage.setItem('user_name', res.data.username)
-      router.push('/schedule/month')
-    })
-    .catch((err) => {
-      console.log(err)
-    })
-}
+    }, { withCredentials: true });
+
+    // クッキーがセットされるのを少し待つ
+    await new Promise(resolve => setTimeout(resolve, 500));
+
+    // リダイレクト
+    router.push('/schedule/month');
+  } catch (err) {
+    console.log(err);
+  }
+};
+
 
 </script>
 

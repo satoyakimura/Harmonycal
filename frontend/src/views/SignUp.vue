@@ -23,14 +23,13 @@ const passwordRules = [
 
 const registerAccount = async () => {
   await axios
-    .post('/signup', {
+    .post('http://localhost:8888/signup', {
       username: user_id.value,
       password: password.value,
-    })
+    }, { withCredentials: true })
     .then((res) => {
-      sessionStorage.setItem('user_id', res.data.id)
-      sessionStorage.setItem('user_name', res.data.username)
-      router.push('/login')
+      sessionStorage.setItem('token', res.data.token);
+      router.push('http://localhost:8888/login')
     })
     .catch((err) => {
       console.log(err)
