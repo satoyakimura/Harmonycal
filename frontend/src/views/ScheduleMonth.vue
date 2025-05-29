@@ -4,6 +4,24 @@
             :options="calendarOptions"
             class="fullcalendar"
         />
+
+        <div v-if="selectedEvent" class="event-edit-form">
+            <h3>予定の編集</h3>
+            <label for="edit-title">タイトル:</label>
+            <input type="text" id="edit-title" v-model="editedEvent.title"><br>
+
+            <label for="edit-start">開始日時:</label>
+            <input type="datetime-local" id="edit-start" v-model="editedEvent.start"><br>
+
+            <label for="edit-end">終了日時:</label>
+            <input type="datetime-local" id="edit-end" v-model="editedEvent.end"><br>
+
+            <label for="edit-description">詳細:</label>
+            <textarea id="edit-description" v-model="editedEvent.description"></textarea><br>
+
+            <button @click="updateSchedule">保存</button>
+            <button @click="closeEditForm">キャンセル</button>
+        </div>
     </div>
 </template>
 
@@ -62,7 +80,8 @@ const calendarOptions = computed(() => ({
 .calendar-container {
     padding-top: 80px;
     width: 100vw;
-    overflow: hidden;
+    overflow-x: auto;
+
 }
 .fullcalendar {
     width: 100%;
